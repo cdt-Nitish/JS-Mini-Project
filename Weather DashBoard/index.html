@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <section class="container">
+      <!-- input field search  -->
+        <div class="weather_header">
+        <form class="weather_search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            class="city_name"
+            placeholder="search your city..."
+          />
+        </form>
+      </div>
+      <!-- weather main data -->
+        
+      <div class="weather_body">
+        <h1 class="weather_city"></h1>
+        <p class="weather_date_time"></p>
+        <div class="weather_data">
+          <p class="weather_forecast"></p>
+          <div class="weather_icon"></div>
+        </div>
+        <p class="weather_temperature"></p>
+        <div class="weather_minmax">
+          <p class="weather_min"></p>
+          <p class="weather_max"></p>
+        </div>
+      </div>
+
+      <!-- weather extra data  -->
+      <section class="weather_info">
+        <div class="weather_card">
+          <i class="fa-solid fa-droplet"></i>
+          <div>
+            <p>Feels Like</p>
+            <p class="weather_feelsLike">15&#176</p>
+          </div>
+        </div>
+
+        <div class="weather_card">
+          <i class="fa-solid fa-droplet"></i>
+          <div>
+              <p>Humidity</p>
+              <p class="weather_humidity">15&#176</p>
+          </div>
+      </div>
+
+      <div class="weather_card">
+        <i class="fa-solid fa-wind"></i>
+        <div>
+            <p>Wind</p>
+            <p class="weather_wind">15&#176</p>
+        </div>
+    </div>
+    
+    <div class="weather_card">
+        <i class="fa-solid fa-gauge-high"></i>
+        <div>
+            <p>Pressure</p>
+            <p class="weather_pressure">15&#176</p>
+        </div>
+    </div>
+     <!--* 3a8ee277deeb3acd69f0c18b873c4bc8 -->
+
+      </section>
+    </section>
+    <script>
+
+<!--! ALL Reffernce             -->
+
+        let cityName=document.querySelector(".weather_city");
+        // cityName.textContent="Pune,India";
+        // all referrence
+        let dateTime = document.querySelector(".weather_date_time");
+        let w_forecast = document.querySelector(".weather_forecast");
+        let w_icon = document.querySelector(".weather_icon");
+        let w_temperature = document.querySelector(".weather_temperature");
+        let w_minTem = document.querySelector(".weather_min");
+        let w_maxTem = document.querySelector(".weather_max");
+
+        let w_feelsLike = document.querySelector(".weather_feelsLike");
+        let w_humidity = document.querySelector(".weather_humidity");
+        let w_wind = document.querySelector(".weather_wind");
+        let w_pressure = document.querySelector(".weather_pressure");
+
+        let citySearch = document.querySelector(".weather_search");
+
+        // to get the country full name
+        const getCountryName=(code)=>{
+            return  new Intl.DisplayNames([code],{type:"region"}).of(code);
+        }
+        
+        //Geting date and time
+        const getDateTime=(dt)=>{
+          const curDate = new Date(dt * 1000); // Convert seconds to milliseconds
+          console.log(curDate);
+          const options = {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+          };
+          
+          const formatter=new Intl.DateTimeFormat("en-US",options);
+
+          console.log(formatter);
+          return formatter.format(curDate);
+        }
+
+        // Search Functionality
+
+        let city="New Delhi";
+        citySearch.addEventListener("submit",(e)=>{
+          e.preventDefault();
+          let cityName=document.querySelector(".city_name");
+          console.log(cityName.value);
+          city=cityName.value;
+          getWeatherData();
+          cityName.value="";
+        })
+
+
+
+        const getWeatherData=async ()=>{
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=3a8ee277deeb3acd69f0c18b873c4bc8`;
+
+            try{
+                const res = await fetch(weatherUrl);
+                const data = await res.json();
+                console.log(data);
+
+                const { main, name, weather, wind, sys, dt } = data;
+
+                cityName.innerHTML = `${name}, ${getCountryName(sys.country)}`;
+                dateTime.innerHTML = getDateTime(dt);
+
+
+                w_forecast.innerHTML=`${weather[0].main}`;
+                // w_icon.innerHTML =`${weather[0].icon}`;
+               w_icon.innerHTML = `<img src="http://openweathermap.org/img/wn/${weather[0].icon}@4x.png" />`;
+
+
+                w_temperature.innerHTML=`${main.temp}&#176`;
+                w_minTem.innerHTML=`Min : ${main.temp_min.toFixed(2)}&#176`;
+                w_maxTem.innerHTML=`Max : ${main.temp_max.toFixed(2)}&#176`;
+
+                w_feelsLike.innerHTML=`${main.feels_like}&#176`;
+                w_humidity.innerHTML=`${main.humidity}%`;
+                w_wind.innerHTML=`${wind.speed} m/s`;
+                w_pressure.innerHTML=`${main.pressure} hPa`;
+
+            }catch(error){
+                console.log(error);
+            }
+        }
+        document.body.addEventListener("load",getWeatherData())
+
+    </script>
+  </body>
+</html>
